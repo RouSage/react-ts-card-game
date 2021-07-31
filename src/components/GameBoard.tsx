@@ -1,29 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CardElement, elementPairsCount } from '../utils/cardElements';
+import { Button, Segment } from 'semantic-ui-react';
+import { elementPairsCount, getCardElements } from '../utils/cardElements';
 import Card from './Card';
 
 type GameBoardProps = {
-  cards: CardElement[];
+  moveCount: number;
+  bestScore: string;
   handleCompletion: () => void;
   incrementMoveCount: () => void;
 };
 
-const ContainerStyles: React.CSSProperties = {
-  padding: '12',
-  display: 'grid',
-  gridTemplateColumns: 'repeat(4, 1fr)',
-  gridTemplateRows: 'repeat(3, 1fr)',
-  justifyItems: 'center',
-  alignItems: 'stretch',
-  gap: '1rem',
-  perspective: '100%',
+const GameBoardStyles: Record<string, React.CSSProperties> = {
+  container: {
+    padding: '12',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gridTemplateRows: 'repeat(3, 1fr)',
+    justifyItems: 'center',
+    alignItems: 'stretch',
+    gap: '1rem',
+    perspective: '100%',
+  },
+  scores: {
+    display: 'inline-block',
+    margin: '1em 0.8rem',
+  },
 };
 
 const GameBoard = ({
-  cards,
+  bestScore,
+  moveCount,
   handleCompletion,
   incrementMoveCount,
 }: GameBoardProps): JSX.Element => {
+  const [cards, setCards] = useState(getCardElements());
   const [openCards, setOpenCards] = useState<number[]>([]);
   const [matchedCards, setMatchedCards] = useState<Record<string, boolean>>({});
   const [disableAll, setDisableAll] = useState(false);
@@ -41,6 +51,13 @@ const GameBoard = ({
     } else {
       setOpenCards([index]);
     }
+  };
+
+  const handleRestart = (): void => {
+    setMatchedCards({});
+    // Timeout is needed so matchCards will have time to reset
+    // and the user won't be able to see positions of the new cards
+    timeout.current = setTimeout(() => setCards(getCardElements()), 300);
   };
 
   const checkIsFlipped = (index: number): boolean => {
@@ -64,7 +81,7 @@ const GameBoard = ({
       timeout.current = setTimeout(() => {
         setOpenCards([]);
         setDisableAll(false);
-      }, 400);
+      }, 300);
     };
 
     let timeToCheck: NodeJS.Timeout;
@@ -81,7 +98,8 @@ const GameBoard = ({
     const checkCompletion = (): void => {
       if (elementPairsCount === Object.keys(matchedCards).length) {
         handleCompletion();
-        setMatchedCards({});
+        // Restart board when user wins
+        handleRestart();
       }
     };
 
@@ -89,21 +107,30 @@ const GameBoard = ({
   }, [matchedCards, handleCompletion]);
 
   return (
-    <section style={ContainerStyles}>
-      {cards.map((card, index) => (
-        <Card
-          card={card}
-          key={card.id}
-          index={index}
-          /*
-           * Card stays flipped when it is opened (present in openCards array)
-           * or already matched
-           */
-          isFlipped={checkIsFlipped(index) || checkIsMatched(card.type)}
-          onCardClick={handleCardClick}
-        />
-      ))}
-    </section>
+    <>
+      <section style={GameBoardStyles.container}>
+        {cards.map((card, index) => (
+          <Card
+            card={card}
+            key={card.id}
+            index={index}
+            /*
+             * Card stays flipped when it is opened (present in openCards array)
+             * or already matched
+             */
+            isFlipped={checkIsFlipped(index) || checkIsMatched(card.type)}
+            onCardClick={handleCardClick}
+          />
+        ))}
+      </section>
+      <Segment textAlign='center' basic as='section'>
+        <Segment.Inline>
+          <h3 style={GameBoardStyles.scores}>MOVES: {moveCount}</h3>
+          <h3 style={GameBoardStyles.scores}>BEST SCORE: {bestScore}</h3>
+        </Segment.Inline>
+        <Button onClick={handleRestart}>Restart</Button>
+      </Segment>
+    </>
   );
 };
 

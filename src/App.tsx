@@ -1,22 +1,14 @@
 import React, { useState } from 'react';
 import useLocalStorage from 'react-use-localstorage';
-import { Button, Modal, Segment } from 'semantic-ui-react';
+import { Button, Modal } from 'semantic-ui-react';
 import GameBoard from './components/GameBoard';
-import { getCardElements } from './utils/cardElements';
 
-const AppStyles: Record<string, React.CSSProperties> = {
-  main: {
-    margin: '2rem auto',
-    maxWidth: '50vw',
-  },
-  scores: {
-    display: 'inline-block',
-    margin: '1em 0.8rem',
-  },
+const AppStyles: React.CSSProperties = {
+  margin: '2rem auto',
+  maxWidth: '50vw',
 };
 
 const App = (): JSX.Element => {
-  const [cards, setCards] = useState(getCardElements());
   const [bestScore, setBestScore] = useLocalStorage(
     'bestScore',
     Number.MAX_SAFE_INTEGER.toString()
@@ -28,9 +20,8 @@ const App = (): JSX.Element => {
     setMoveCount(moveCount + 1);
   };
 
-  const handleRestart = (): void => {
+  const resetStats = (): void => {
     setOpenModal(false);
-    setCards(getCardElements());
     setMoveCount(0);
   };
 
@@ -41,21 +32,19 @@ const App = (): JSX.Element => {
   };
 
   return (
-    <main style={AppStyles.main}>
+    <main style={AppStyles}>
       <GameBoard
-        cards={cards}
+        moveCount={moveCount}
+        bestScore={
+          bestScore === Number.MAX_SAFE_INTEGER.toString()
+            ? 'unknown'
+            : bestScore
+        }
         handleCompletion={handleCompletion}
         incrementMoveCount={incrementMoveCount}
       />
-      <Segment textAlign='center' basic as='section'>
-        <Segment.Inline>
-          <h3 style={AppStyles.scores}>MOVES: {moveCount}</h3>
-          <h3 style={AppStyles.scores}>BEST SCORE: {bestScore}</h3>
-        </Segment.Inline>
-        <Button onClick={handleRestart}>Restart</Button>
-      </Segment>
       {openModal && (
-        <Modal open={openModal} onClose={handleRestart}>
+        <Modal open={openModal}>
           <Modal.Header>Congratulations</Modal.Header>
           <Modal.Content>
             <p>
@@ -63,8 +52,8 @@ const App = (): JSX.Element => {
             </p>
           </Modal.Content>
           <Modal.Actions>
-            <Button positive onClick={handleRestart}>
-              Restart
+            <Button positive onClick={resetStats}>
+              Close
             </Button>
           </Modal.Actions>
         </Modal>

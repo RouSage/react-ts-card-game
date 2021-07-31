@@ -50,6 +50,8 @@ const Card = ({
       isFlipped={isFlipped}
       containerStyle={CardStyle.container}
       cardStyles={{ front: CardStyle.card, back: CardStyle.card }}
+      flipSpeedBackToFront={0.3}
+      flipSpeedFrontToBack={0.3}
     >
       <div
         key='front'
