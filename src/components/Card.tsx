@@ -5,11 +5,12 @@ import { CardElement } from '../utils/cardElements';
 
 type CardProps = {
   card: CardElement;
+  index: number;
   isFlipped: boolean;
-  onCardClick: (id: number) => void;
+  onCardClick: (index: number) => void;
 };
 
-const CardStyle: { [key: string]: React.CSSProperties } = {
+const CardStyle: Record<string, React.CSSProperties> = {
   container: {
     width: '100%',
     maxWidth: '140px',
@@ -29,10 +30,14 @@ const CardStyle: { [key: string]: React.CSSProperties } = {
   },
 };
 
-const Card = ({ card, isFlipped, onCardClick }: CardProps): JSX.Element => {
-  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    onCardClick(card.id);
+const Card = ({
+  card,
+  index,
+  isFlipped,
+  onCardClick,
+}: CardProps): JSX.Element => {
+  const handleCardClick = (): void => {
+    if (!isFlipped) onCardClick(index);
   };
 
   const handleCardKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
@@ -45,6 +50,8 @@ const Card = ({ card, isFlipped, onCardClick }: CardProps): JSX.Element => {
       isFlipped={isFlipped}
       containerStyle={CardStyle.container}
       cardStyles={{ front: CardStyle.card, back: CardStyle.card }}
+      flipSpeedBackToFront={0.3}
+      flipSpeedFrontToBack={0.3}
     >
       <div
         key='front'
@@ -80,4 +87,4 @@ const Card = ({ card, isFlipped, onCardClick }: CardProps): JSX.Element => {
   );
 };
 
-export default Card;
+export default React.memo(Card);
