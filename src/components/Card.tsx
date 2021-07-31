@@ -10,7 +10,7 @@ type CardProps = {
   onCardClick: (index: number) => void;
 };
 
-const CardStyle: { [key: string]: React.CSSProperties } = {
+const CardStyle: Record<string, React.CSSProperties> = {
   container: {
     width: '100%',
     maxWidth: '140px',

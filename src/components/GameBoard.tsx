@@ -1,12 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CardElement, elementPairsCount } from '../utils/cardElements';
 import Card from './Card';
-import './GameBoard.css';
 
 type GameBoardProps = {
   cards: CardElement[];
   handleCompletion: () => void;
   incrementMoveCount: () => void;
+};
+
+const ContainerStyles: React.CSSProperties = {
+  padding: '12',
+  display: 'grid',
+  gridTemplateColumns: 'repeat(4, 1fr)',
+  gridTemplateRows: 'repeat(3, 1fr)',
+  justifyItems: 'center',
+  alignItems: 'stretch',
+  gap: '1rem',
+  perspective: '100%',
 };
 
 const GameBoard = ({
@@ -79,7 +89,7 @@ const GameBoard = ({
   }, [matchedCards, handleCompletion]);
 
   return (
-    <div className='container'>
+    <section style={ContainerStyles}>
       {cards.map((card, index) => (
         <Card
           card={card}
@@ -93,7 +103,7 @@ const GameBoard = ({
           onCardClick={handleCardClick}
         />
       ))}
-    </div>
+    </section>
   );
 };
 
