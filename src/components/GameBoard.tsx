@@ -19,27 +19,6 @@ const GameBoard = ({
   const [disableAll, setDisableAll] = useState(false);
   const timeout = useRef<NodeJS.Timeout | null>(null);
 
-  const checkCompletion = (): void => {
-    if (Math.floor(cards.length / 2) === Object.keys(matchedCards).length) {
-      handleCompletion();
-    }
-  };
-
-  const checkMatch = (): void => {
-    const [first, second] = openCards;
-
-    if (cards[first].type === cards[second].type) {
-      setMatchedCards((prev) => ({ ...prev, [cards[first].type]: true }));
-    }
-
-    // Clear openCards array and enable interactions
-    // whether cards matched or not
-    timeout.current = setTimeout(() => {
-      setOpenCards([]);
-      setDisableAll(false);
-    }, 500);
-  };
-
   const handleCardClick = (index: number): void => {
     if (disableAll) return;
 
@@ -63,6 +42,21 @@ const GameBoard = ({
   };
 
   useEffect(() => {
+    const checkMatch = (): void => {
+      const [first, second] = openCards;
+
+      if (cards[first].type === cards[second].type) {
+        setMatchedCards((prev) => ({ ...prev, [cards[first].type]: true }));
+      }
+
+      // Clear openCards array and enable interactions
+      // whether cards matched or not
+      timeout.current = setTimeout(() => {
+        setOpenCards([]);
+        setDisableAll(false);
+      }, 500);
+    };
+
     let timeToCheck: NodeJS.Timeout;
 
     if (openCards.length === 2) {
@@ -71,11 +65,17 @@ const GameBoard = ({
     return () => {
       clearTimeout(timeToCheck);
     };
-  }, [openCards]);
+  }, [openCards, cards]);
 
   useEffect(() => {
+    const checkCompletion = (): void => {
+      if (Math.floor(cards.length / 2) === Object.keys(matchedCards).length) {
+        handleCompletion();
+      }
+    };
+
     checkCompletion();
-  }, [matchedCards]);
+  }, [matchedCards, cards.length, handleCompletion]);
 
   useEffect(() => {
     setMatchedCards({});
