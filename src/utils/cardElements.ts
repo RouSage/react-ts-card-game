@@ -11,15 +11,18 @@ export type CardElement = {
   image: string;
 };
 
+const images: Record<string, string> = {
+  css,
+  html,
+  js,
+  react,
+  redux,
+  node,
+};
+
+export const elementPairsCount = Object.keys(images).length;
+
 const buildCardElements = (): CardElement[] => {
-  const images: Record<string, string> = {
-    css,
-    html,
-    js,
-    react,
-    redux,
-    node,
-  };
   let id = 0;
 
   const cardElements: CardElement[] = Object.keys(images).reduce(

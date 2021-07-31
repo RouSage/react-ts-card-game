@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CardElement } from '../utils/cardElements';
+import { CardElement, elementPairsCount } from '../utils/cardElements';
 import Card from './Card';
 import './GameBoard.css';
 
@@ -23,9 +23,9 @@ const GameBoard = ({
     if (disableAll) return;
 
     if (openCards.length === 1) {
-      // On this step we will have two cards in the openCards array
+      // On this step we will have two cards in the openCards array...
       setOpenCards((prev) => [...prev, index]);
-      // so we can disable all interactions with cards (clicks)
+      // ...so we can disable all interactions with cards (clicks)
       setDisableAll(true);
       incrementMoveCount();
     } else {
@@ -54,13 +54,13 @@ const GameBoard = ({
       timeout.current = setTimeout(() => {
         setOpenCards([]);
         setDisableAll(false);
-      }, 500);
+      }, 400);
     };
 
     let timeToCheck: NodeJS.Timeout;
 
     if (openCards.length === 2) {
-      timeToCheck = setTimeout(checkMatch, 300);
+      timeToCheck = setTimeout(checkMatch, 200);
     }
     return () => {
       clearTimeout(timeToCheck);
@@ -69,17 +69,14 @@ const GameBoard = ({
 
   useEffect(() => {
     const checkCompletion = (): void => {
-      if (Math.floor(cards.length / 2) === Object.keys(matchedCards).length) {
+      if (elementPairsCount === Object.keys(matchedCards).length) {
         handleCompletion();
+        setMatchedCards({});
       }
     };
 
     checkCompletion();
-  }, [matchedCards, cards.length, handleCompletion]);
-
-  useEffect(() => {
-    setMatchedCards({});
-  }, [cards]);
+  }, [matchedCards, handleCompletion]);
 
   return (
     <div className='container'>
