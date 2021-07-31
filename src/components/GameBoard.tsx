@@ -1,16 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getCardElements } from '../utils/cardElements';
+import { CardElement } from '../utils/cardElements';
 import Card from './Card';
 import './GameBoard.css';
 
-const GameBoard = (): JSX.Element => {
-  const [cards, setCards] = useState(getCardElements());
+type GameBoardProps = {
+  cards: CardElement[];
+  handleCompletion: () => void;
+  incrementMoveCount: () => void;
+};
+
+const GameBoard = ({
+  cards,
+  handleCompletion,
+  incrementMoveCount,
+}: GameBoardProps): JSX.Element => {
   const [openCards, setOpenCards] = useState<number[]>([]);
-  const [matchedCards, setMatchedCards] = useState<{ [key: string]: boolean }>(
-    {}
-  );
+  const [matchedCards, setMatchedCards] = useState<Record<string, boolean>>({});
   const [disableAll, setDisableAll] = useState(false);
   const timeout = useRef<NodeJS.Timeout | null>(null);
+
+  const checkCompletion = (): void => {
+    if (Math.floor(cards.length / 2) === Object.keys(matchedCards).length) {
+      handleCompletion();
+    }
+  };
 
   const checkMatch = (): void => {
     const [first, second] = openCards;
@@ -35,6 +48,7 @@ const GameBoard = (): JSX.Element => {
       setOpenCards((prev) => [...prev, index]);
       // so we can disable all interactions with cards (clicks)
       setDisableAll(true);
+      incrementMoveCount();
     } else {
       setOpenCards([index]);
     }
@@ -58,6 +72,14 @@ const GameBoard = (): JSX.Element => {
       clearTimeout(timeToCheck);
     };
   }, [openCards]);
+
+  useEffect(() => {
+    checkCompletion();
+  }, [matchedCards]);
+
+  useEffect(() => {
+    setMatchedCards({});
+  }, [cards]);
 
   return (
     <div className='container'>
