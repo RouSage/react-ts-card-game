@@ -27,8 +27,6 @@ describe('Card', () => {
       <Card card={card} index={0} isFlipped={false} onCardClick={onClick} />
     );
 
-    screen.debug();
-
     userEvent.click(screen.getByAltText(/Card/), { bubbles: true });
     userEvent.click(screen.getByAltText(card.type), { bubbles: true });
     expect(onClick).toHaveBeenCalledTimes(2);
